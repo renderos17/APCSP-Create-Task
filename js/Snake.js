@@ -60,9 +60,9 @@ $(function(){
 
 //change these to modify output of back
   var dots = {
-    nb: 100,
-    distance: 75,
-    d_radius: 75,
+    nb: 1000,
+    distance: 25,
+    d_radius: 125,
     array: []
   };
 

@@ -52,10 +52,10 @@ $(function(){
   	var msgsWall = [];
     	msgsWall[0] = "Is your head still screwed on?";
     	msgsWall[1] = "The wall is stronger than it seems!";
-    	msgsWall[2] = "There's no way to escape the game... Unless...";
+    	msgsWall[2] = "There's no way to escape the game, stop trying!";
     	msgsWall[3] = "LOOK MA! NO HEAD!!!";
     	msgsWall[4] = "Can't see the wall? Huh?";
-      msgsWall[5] = "Maybe I'll be nice and let you weaken the wall a bit. Nah! ;)";
+      msgsWall[5] = "Maybe I'll be nice and let you go past the wall. Nah! ;)";
       msgsWall[6] = "Reminder: You need to keep inside the walls to win.";
 
 //change these to modify output of back

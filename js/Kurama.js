@@ -1,4 +1,13 @@
-$(function(){
+document.addEventListener("DOMContentLoaded", function () {
+    if (BABYLON.Engine.isSupported()) {
+        initScene();
+    }
+}, false);
+
+/**
+ * Creates a new BABYLON Engine and initialize the scene
+ */
+function initScene() {
 // Get the canvas element from our HTML above
 var canvas = document.getElementById("renderCanvas");
 
@@ -43,6 +52,8 @@ var createScene = function () {
 
 var scene = createScene();
 
+BABYLON.SceneLoader.Load("", "ship.stl", engine, scene);
+
 window.addEventListener("resize", function () {
 	engine.resize();
 });
@@ -50,4 +61,4 @@ window.addEventListener("resize", function () {
 engine.runRenderLoop(function() {
 	scene.render();
 });
-});
+}

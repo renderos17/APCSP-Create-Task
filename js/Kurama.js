@@ -4,61 +4,86 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 }, false);
 
-/**
- * Creates a new BABYLON Engine and initialize the scene
- */
 function initScene() {
-// Get the canvas element from our HTML above
-var canvas = document.getElementById("renderCanvas");
 
-// Load the BABYLON 3D engine
-var engine = new BABYLON.Engine(canvas, true);
+	var canvas = document.getElementById("renderCanvas");
+	var engine = new BABYLON.Engine(canvas, true);
 
-// This begins the creation of a function that we will 'call' just after it's built
 var createScene = function () {
-	// Now create a basic Babylon Scene object 
 	var scene = new BABYLON.Scene(engine);
+	scene.clearColor = new BABYLON.Color3(0, 1, 0); // Bright green.
 
-	// Change the scene background color to green.
-	scene.clearColor = new BABYLON.Color3(0, 1, 0);
+	var camera = new BABYLON.FreeCamera("sceneCamera", new BABYLON.Vector3(0, 1, -15), scene);
+	camera.inputs.addKeyboard();
+	var inputManager = camera.inputs;
 
-	// This creates and positions a free camera
-	var camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(0, 5, -10), scene);
+	var light1 = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(0, 1, 0), scene);
+	light1.intensity = .5;
 
-	// This targets the camera to scene origin
-	camera.setTarget(BABYLON.Vector3.Zero());
+	var light2 = new BABYLON.HemisphericLight("light2", new BABYLON.Vector3(0, -1, 0), scene);
+	light2.intensity = .5;
 
-	// This attaches the camera to the canvas
-	camera.attachControl(canvas, false);
-
-	// This creates a light, aiming 0,1,0 - to the sky.
-	var light = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(0, 1, 0), scene);
-
-	// Dim the light a small amount
-	light.intensity = .5;
-
-	// var light2 = new BABYLON.PointLight("Omni", new BABYLON.Vector3(0, 10, 100), scene);
-
-	// Let's try our built-in 'sphere' shape. Params: name, subdivisions, size, scene
 	var sphere = BABYLON.Mesh.CreateSphere("sphere1", 16, 4, scene);
-
 	var materialSphere1 = new BABYLON.StandardMaterial("texture1", scene);
-
-	// materialSphere1.diffuseColor = new BABYLON.Color3(1.0, 0.2, 0.7);
-
-	materialSphere1.diffuseTexture = new BABYLON.Texture("textures/flower1.jpg", scene);
-
+	materialSphere1.diffuseTexture = new BABYLON.Texture("textures/pcb.svg", scene);
 	sphere.material = materialSphere1;
-
-	// Move the sphere upward 1/2 its height
 	sphere.position.y = 2;
 
-	// Let's try our built-in 'ground' shape.  Params: name, width, depth, subdivisions, scene
-	var ground = BABYLON.Mesh.CreateGround("ground1", 100, 100, 100, scene);
-	var groundText1 = new BABYLON.StandardMaterial("texture2", scene);
-    groundText1.diffuseTexture = new BABYLON.Texture("textures/space.jpg", scene);
+	var boxSize = 1000;
 
-	// Leave this function
+	// Placement rules for planes:
+	//
+	// You shall not use a negative Y value.
+	// ...
+	// ...
+	// ...
+	// That is all.
+
+    var plane1 = BABYLON.Mesh.CreatePlane("planeBot", boxSize, scene); // Good!
+    plane1.position.y = 0;
+    plane1.rotation.x = Math.PI / 2;
+        
+    var plane2 = BABYLON.Mesh.CreatePlane("planeNor", boxSize, scene);
+    plane2.position.x = 0;
+    plane2.position.y = boxSize / 2.0;
+    plane2.position.z = boxSize / 2.0;
+    
+    var plane3 = BABYLON.Mesh.CreatePlane("planeEas", boxSize, scene); // Good!
+    plane3.position.x = boxSize / 2.0;
+    plane3.position.y = boxSize / 2.0;
+    plane3.position.z = 0;
+    plane3.rotation.y = Math.PI / 2;
+
+    var plane4 = BABYLON.Mesh.CreatePlane("planeSou", boxSize, scene);
+    plane4.position.x = 0;
+    plane4.position.y = boxSize / 2.0;
+    plane4.position.z = -(boxSize / 2.0);
+
+    var plane5 = BABYLON.Mesh.CreatePlane("planeWes", boxSize, scene); // Good!
+    plane5.position.x = -(boxSize / 2.0);
+    plane5.position.y = boxSize / 2.0;
+    plane5.position.z = 0;
+    plane5.rotation.y = Math.PI / 2;
+    
+    var plane6 = BABYLON.Mesh.CreatePlane("planeTop", boxSize, scene); // Good!
+    plane6.position.y = boxSize;
+    plane6.rotation.x = Math.PI / 2;
+
+    var materialPlane = new BABYLON.StandardMaterial("texturePlane", scene);
+    materialPlane.diffuseTexture = new BABYLON.Texture("textures/space1.jpg", scene);
+    materialPlane.diffuseTexture.uScale = 10.0;
+    materialPlane.diffuseTexture.vScale = 10.0;
+    materialPlane.backFaceCulling = false;
+
+    plane1.material = materialPlane;
+    plane2.material = materialPlane;
+    plane3.material = materialPlane;
+    plane4.material = materialPlane;
+    plane5.material = materialPlane;
+    plane6.material = materialPlane;
+
+	camera.attachControl(canvas, false); // req
+
 	return scene;
 };
 
@@ -71,6 +96,27 @@ window.addEventListener("resize", function () {
 });
 
 engine.runRenderLoop(function() {
+	var dir = "n";
+	document.onkeydown = function(e) {
+			var key = e.keyCode;
+
+			if(key == 65 && dir != "right") dir = "left";
+			else if(key == 87 && dir != "down") dir = "up";
+			else if(key == 68 && dir != "left") dir = "right";
+			else if(key == 83 && dir != "up") dir = "down";
+
+			if(key) e.preventDefault();
+	}
+
+	// camera.position.x
+	// camera.position.y
+	// camera.position.z
+
+	if(dir == "right") sphere.positon.x++;
+	else if(dir == "left") sphere.positon.x--;
+	else if(dir == "up") sphere.positon.y--;
+	else if(dir == "down") sphere.positon.y++;
+
 	scene.render();
 });
 }

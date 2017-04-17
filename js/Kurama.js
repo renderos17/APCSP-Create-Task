@@ -9,11 +9,23 @@ function initScene() {
 	var canvas = document.getElementById("renderCanvas");
 	var engine = new BABYLON.Engine(canvas, true);
 
+	var theHud = document.getElementById('theHUD'),
+      sP = theHud.getContext('2d')
+	theHud.style.width = '100%';
+	theHud.style.height= '100%';
+
 var createScene = function () {
 	var scene = new BABYLON.Scene(engine);
+	var gravityVector = new BABYLON.Vector3(0,-9.81, 0);
+	var physicsPlugin = new BABYLON.CannonJSPlugin();
+	scene.enablePhysics(gravityVector, physicsPlugin);
+	scene.actionManager = new BABYLON.ActionManager(scene);
+
 	scene.clearColor = new BABYLON.Color3(0, 1, 0); // Bright green.
 
 	var camera = new BABYLON.FreeCamera("sceneCamera", new BABYLON.Vector3(0, 1, -15), scene);
+	camera.inputs.clear();
+	camera.inputs.addMouse();
 	camera.inputs.addKeyboard();
 	var inputManager = camera.inputs;
 
@@ -31,6 +43,8 @@ var createScene = function () {
 
 	var boxSize = 1000;
 
+	var playerSpeed = 0.1;
+
 	// Placement rules for planes:
 	//
 	// You shall not use a negative Y value.
@@ -43,7 +57,7 @@ var createScene = function () {
     plane1.position.y = 0;
     plane1.rotation.x = Math.PI / 2;
         
-    var plane2 = BABYLON.Mesh.CreatePlane("planeNor", boxSize, scene);
+    var plane2 = BABYLON.Mesh.CreatePlane("planeNor", boxSize, scene); // Good!
     plane2.position.x = 0;
     plane2.position.y = boxSize / 2.0;
     plane2.position.z = boxSize / 2.0;
@@ -54,7 +68,7 @@ var createScene = function () {
     plane3.position.z = 0;
     plane3.rotation.y = Math.PI / 2;
 
-    var plane4 = BABYLON.Mesh.CreatePlane("planeSou", boxSize, scene);
+    var plane4 = BABYLON.Mesh.CreatePlane("planeSou", boxSize, scene); // Good!
     plane4.position.x = 0;
     plane4.position.y = boxSize / 2.0;
     plane4.position.z = -(boxSize / 2.0);
@@ -82,6 +96,26 @@ var createScene = function () {
     plane5.material = materialPlane;
     plane6.material = materialPlane;
 
+    scene.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnKeyDownTrigger, function (evt) {
+		if (evt.sourceEvent.key == "w") {
+			sphere.position.y += playerSpeed;
+		}
+		if (evt.sourceEvent.key == "s") {
+			sphere.position.y -= playerSpeed;
+		}
+		if (evt.sourceEvent.key == "a") {
+			sphere.position.x += playerSpeed;
+		}
+		if (evt.sourceEvent.key == "d") {
+			sphere.position.x -= playerSpeed;
+		}
+		else {
+			console.log(sphere.position.y);
+		}
+
+		console.log(sphere.position.x);
+	}));
+
 	camera.attachControl(canvas, false); // req
 
 	return scene;
@@ -96,27 +130,6 @@ window.addEventListener("resize", function () {
 });
 
 engine.runRenderLoop(function() {
-	var dir = "n";
-	document.onkeydown = function(e) {
-			var key = e.keyCode;
-
-			if(key == 65 && dir != "right") dir = "left";
-			else if(key == 87 && dir != "down") dir = "up";
-			else if(key == 68 && dir != "left") dir = "right";
-			else if(key == 83 && dir != "up") dir = "down";
-
-			if(key) e.preventDefault();
-	}
-
-	// camera.position.x
-	// camera.position.y
-	// camera.position.z
-
-	if(dir == "right") sphere.positon.x++;
-	else if(dir == "left") sphere.positon.x--;
-	else if(dir == "up") sphere.positon.y--;
-	else if(dir == "down") sphere.positon.y++;
-
 	scene.render();
 });
 }
